@@ -20,7 +20,11 @@ You just have to configure cmake so that it use `clang-hook` as the C compiler a
 
 That's all!
 
-## Use it !
+## Install it!
+
+Clone the repo, and `make install` (global install, need root (not recommended) or a virtualenv) or `make localinstall` (local install, I use that).
+
+## Use it!
 
 There is a user documentation.
 
