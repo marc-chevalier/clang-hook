@@ -28,7 +28,7 @@ Clone the repo, and `make install` (global install, need root (not recommended) 
 
 There is a user documentation.
 
-### tl;dr 
+### tl;dr
 
 1. Does it work? Yes, absolutely! I used it a lot of time. 
 
@@ -49,7 +49,12 @@ There is a user documentation.
   ```bash
   over-make make -j4
   ```
-  
+
+5. What is this `over-make` anyway? It is a program that synchronises `clang-hook` (and makes them run even faster!). There is a specific documentation.
+  You will need to know how to use `clang-hook` anyway. It achieves its task by communicating with `clang-hook` using a server-client architecture. In this case, `clang-hook`
+  run in network mode, but don't worry, it works the same way for the user.
+
+
 ## Contributing
 
 You want to contribute?! Great! There is a few constraints. First, use only the standard Python3 library and no Python3 version newer than what we find in Ubuntu packages (or other mainstream distribution). I want to keep it easy to install and relatively easy to use.
