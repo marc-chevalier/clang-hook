@@ -7,7 +7,7 @@ This software is made for computer scientist who want to configure the compilati
 
 ## History
 
-Remember the good ol' time when, to compile with your own configuration you just had to write TEST.name.Mafile and TEST.name.report? Now, with this CMake-based architecture, it's impossible. Cmake write all the makefiles for you and there is not way to tell him what you want. `clang-hook` is made for you!
+Remember the good ol' time when, to use llvm-test-suite with your own configuration you just had to write your TEST.name.Makefile and TEST.name.report? Now, with this CMake-based architecture, it's impossible. Cmake write all the makefiles for you and there is not way to tell him what you want. `clang-hook` is made for you!
 
 In fact, until LLVM 3.7, you could just use `configure` to use the old architecture (maybe with a little trick to disable the warning). But since 3.8, `configure` contains nothing but the warning.
 
@@ -57,6 +57,6 @@ There is a user documentation.
 
 ## Contributing
 
-You want to contribute?! Great! There is a few constraints. First, use only the standard Python3 library and no Python3 version newer than what we find in Ubuntu packages (or other mainstream distribution). I want to keep it easy to install and relatively easy to use.
+You want to contribute?! Great! There is a few constraints. First, use only the standard Python3 library and make it work for Python3 in the version we find in Ubuntu packages (or other mainstream distribution). I want to keep it easy to install and relatively easy to use.
 
 If you could follow the PEP-8, it would be great.
