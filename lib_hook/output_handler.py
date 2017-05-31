@@ -1,6 +1,7 @@
 import json
 import typing
 import lib_hook
+import collections
 
 
 class OutputHandler:
@@ -81,6 +82,16 @@ class OutputHandler:
                     results[f.name] = sum(results[f.name])
                 elif f.summary == "mean":
                     results[f.name] = sum(results[f.name])/len(results[f.name])
+                elif f.summary == "append":
+                    pass  # Indeed, resulsts is built with the list of all matches.
+                elif f.summary == "number":
+                    results[f.name] = len(results[f.name])
+                elif f.summary == "or":
+                    results[f.name] = any(results[f.name])
+                elif f.summary == "and":
+                    results[f.name] = all(results[f.name])
+                elif f.summary == "count":
+                    results[f.name] = dict(collections.Counter(results[f.name]))
 
         summary_obj["results"] = [{"name": k, "result": v} for k, v in results.items()]
         self.report_obj["summary"].append(summary_obj)

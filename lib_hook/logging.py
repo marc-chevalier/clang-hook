@@ -1,8 +1,27 @@
+import abc
 import sys
 import pickle
 import logging
 import datetime
 import logging.handlers
+
+
+class AbstractLogger(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def panic(self, msg, args=None):
+        pass
+
+    @abc.abstractmethod
+    def warning(self, msg, args=None):
+        pass
+
+    @abc.abstractmethod
+    def debug(self, msg):
+        pass
+
+    @abc.abstractmethod
+    def info(self, msg):
+        pass
 
 
 class Logger:
@@ -155,6 +174,26 @@ class ClientLogger:
         })
         size = len(request).to_bytes(4, byteorder="big")
         self.socket.send(size+request)
+
+
+class DummyLogger(AbstractLogger):
+    def __init__(self):
+        self.panic_list = []
+        self.warning_list = []
+        self.debug_list = []
+        self.info_list = []
+
+    def panic(self, msg, args=None):
+        self.panic_list.append(msg)
+
+    def warning(self, msg, args=None):
+        self.warning_list.append(msg)
+
+    def debug(self, msg):
+        self.debug_list.append(msg)
+
+    def info(self, msg):
+        self.info_list.append(msg)
 
 
 def print_debug_info(n, s):

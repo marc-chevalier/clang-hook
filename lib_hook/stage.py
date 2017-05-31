@@ -1,4 +1,4 @@
-from .auto_number import AutoNumber
+from .auto_number import AutoNumber, make_enum_to_str, make_str_to_enum
 
 
 class Stage(AutoNumber):
@@ -8,9 +8,5 @@ class Stage(AutoNumber):
     Link = ()
 
 
-def str_to_stage(s: str) -> Stage:
-    return {"clang": Stage.Clang, "opt": Stage.Opt, "llc": Stage.Llc, "link": Stage.Link}[s]
-
-
-def stage_to_str(s: Stage) -> str:
-    return {Stage.Clang: "clang", Stage.Opt: "opt", Stage.Llc: "llc", Stage.Link: "link"}[s]
+str_to_stage = make_str_to_enum(Stage, name="str_to_stage")
+stage_to_str = make_enum_to_str(Stage, name="stage_to_str")

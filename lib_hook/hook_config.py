@@ -18,13 +18,14 @@ class HookConfig(BaseConfig):
         self.output_file = None
         self.output_stages = None
         self.report_file = None
+
         self.filters = None
         super(HookConfig, self).__init__()
 
     def init(self, info_logger, name="clang-hook", debug=False, arg_path=None):
         super(HookConfig, self).init(name, info_logger, debug, arg_path)
 
-    def parse_config(self,):
+    def parse_config(self):
         self.load = self.data.get("load", [])
         self.passes = self.data.get("passes", [])
         self.link_flags = self.data.get("link_flags", [])

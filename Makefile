@@ -10,4 +10,7 @@ install:
 localinstall:
 	$(PYTHON) setup.py install --user
 
-.PHONY: all install localinstall
+tests:
+	$(PYTHON) run_tests.py
+
+.PHONY: all install localinstall tests
