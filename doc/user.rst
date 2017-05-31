@@ -326,11 +326,12 @@ append new informations.**
 
 ``summary``
 ```````````
-:Type: string among "append", "mean", "sum" and "count"
+:Type: string among "append", "mean", "sum", "number", "or" and "and"
 :Semantic: the action to build the overall summary. "append" will construct a
-  list from each matching value. "count" will count the number of matches.
+  list from each matching value. "number" will count the number of matches.
   These actions is always valid. "mean" and "sum" are pretty clear. They are
   only valid when the field ``type`` is a arithmetic type ("int" or "float").
+  "or" and "and" are valid onyl for "bool".
 
 
 ``pattern``

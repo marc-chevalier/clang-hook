@@ -1,0 +1,10 @@
+{
+    "hook_config": "/path/clang-hook.conf",
+    "error_log": "/path/over_error.log",
+    "info_log": "/path/over_info.log",
+    "debug_log": "/path/over_debug.log",
+    "log": true,
+    "output_file": "/path/over_output.json",
+    "report_file": "/path/spec_over_report.json"
+}
+

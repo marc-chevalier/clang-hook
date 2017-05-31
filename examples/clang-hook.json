@@ -1,0 +1,40 @@
+{
+    "link_flags": [],
+    "passes": ["-hello"],
+    "load": ["/usr/lib/llvm-3.8/lib/LLVMHello.so"],
+    "error_log": "/path/error.log",
+    "info_log": "/path/info.log",
+    "debug_log": "/path/debug.log",
+    "log": true,
+    "output_file": "/path/output.json",
+    "output_stages" : ["opt", "llc", "clang", "link"],
+    "report_file": "/path/report.json",
+    "filters": [
+        {
+            "name": "hellos",
+            "stages": ["opt"],
+            "pattern": "(?<=Hello: )[A-Za-z_][A-Za-z_0-9]*",
+            "type": "string",
+            "mode": "lookaround",
+            "summary": "append"
+        },
+        {
+            "name": "hellos2",
+            "stages": ["opt"],
+            "pattern": "Hello: (?P<name>[A-Za-z_][A-Za-z_0-9]*)",
+            "type": "string",
+            "mode": "group",
+            "group": "name",
+            "summary": "count"
+        },
+        {
+            "name": "hellos_stupid_count",
+            "stages": ["opt"],
+            "pattern": "^Hello: [A-Za-z_]*(?P<name>\d+)[A-Za-z0-9_]*",
+            "type": "int",
+            "mode": "group",
+            "group": "name",
+            "summary": "sum"
+        }
+    ]
+}
