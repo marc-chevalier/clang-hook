@@ -2,6 +2,8 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/s-i-newton/clang-hook/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/s-i-newton/clang-hook/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/s-i-newton/clang-hook/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/s-i-newton/clang-hook/?branch=master)
 
+[![IRC](https://img.shields.io/badge/freenode-%23clang--hook-blue.svg)](http://kiwiirc.com/client/irc.freenode.net/#clang-hook)
+
 # clang-hook
 How to deceive cmake and make llvm test suite computer scientist-friendly again.
 
