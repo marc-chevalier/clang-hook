@@ -1,8 +1,3 @@
-#!/usr/bin/python3
-"""A small script to make the work of clang but with more things under the carpet!
-And fulfilling the PEP8!
-You're going to love me!"""
-
 import io
 import os
 import sys
