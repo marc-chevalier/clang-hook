@@ -1,15 +1,22 @@
+""" Entrypoint of clang-hook. There is a profiled version, to use with care.
+"""
+
 import io
 import os
 import sys
 import pickle
 import pstats
 import socket
-import lib_hook
 import cProfile
 import selectors
 
+import lib_hook
+
 
 def main():
+    """
+    Entrypoint of clang-hook command. It support both standalone mode and network mode.
+    """
     sock = None
     if "OVER_CLANG_ADDR" in os.environ:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -32,6 +39,10 @@ def main():
         })
 
         def read_response(conn):
+            """Read a aize encoded on 4 bytes and then the request of this size. Thus, everything must be send at the
+            same time otherwise, there is nothing to read and recv() throws an exception.
+
+            It is used as the callback of the socket."""
             size = conn.recv(4)  # Should be ready
             bsize = int.from_bytes(size, byteorder="big")
             if debug:
@@ -41,15 +52,18 @@ def main():
             return response
 
         def send_request(request):
+            """Send a request preceded by their size on 4 bytes (big endian). The size and the request are send at
+            once."""
             size = len(request).to_bytes(4, byteorder="big")
             sock.send(size+request)
 
         def send_and_get(request):
+            """Send a request, wait for a response and return it."""
             send_request(request)
             sel = selectors.DefaultSelector()
             sel.register(sock, selectors.EVENT_READ, read_response)
             events = sel.select()
-            for key, event in events:
+            for key, _ in events:
                 callback = key.data
                 return callback(key.fileobj)
 
@@ -123,12 +137,15 @@ def main():
             lib_hook.print_debug_info("link_output", link_output)
 
     if sock is None:
-        output_handler.finalize()
+        if isinstance(output_handler, lib_hook.OutputHandler):  # Make type checkers happy
+            output_handler.finalize()
     else:
         sock.close()
 
 
 def profiled_main():
+    """A profiled version of clang-hook known as profiled-clang-hook. To use with care since it tends to be very
+    voluble"""
     pr = cProfile.Profile()
     pr.enable()
     main()
@@ -142,14 +159,3 @@ def profiled_main():
 
 if __name__ == "__main__":
     main()
-
-# echo "$@" >> ~/4A/LIP/llvm/log
-# clang -emit-llvm -c test.c -o test.bc
-# opt -O3 test.bc -o test.bc
-# llc -filetype=obj test.bc -o test.o
-
-# Tested with arguments like:
-#   -DNDEBUG -I/home/cheche/4A/LIP/llvm/4.0.0/llvm/projects/test-suite/MultiSource/Benchmarks/MallocBench/cfrac
-#   -I/home/cheche/4A/LIP/llvm/4.0.0/test-suite-build/MultiSource/Benchmarks/MallocBench/cfrac -w -Werror=date-time
-#   -DNOMEMOPT -o CMakeFiles/cfrac.-dir/ptoa.c.o
-#   -c /home/cheche/4A/LIP/llvm/4.0.0/llvm/projects/test-suite/MultiSource/Benchmarks/MallocBench/cfrac/ptoa.c
