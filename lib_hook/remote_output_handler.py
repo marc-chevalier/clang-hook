@@ -1,13 +1,16 @@
+"""Network based output_handler"""
 import json
 import pickle
 import typing
 import lib_hook
 
+from .abstract_output_handler import AbstractOutputHandler
 
-class ClientOutputHandler:
+
+class ClientOutputHandler(AbstractOutputHandler):
+    """Client side of the network output handler. Do the computation and send the results via the given socket."""
     def __init__(self, config, logger, socket):
-        self.config = config
-        self.logger = logger
+        super(ClientOutputHandler, self).__init__(config, logger)
         self.socket = socket
 
     def handle_output(self,
@@ -15,11 +18,11 @@ class ClientOutputHandler:
                       stage: lib_hook.Stage,
                       input_file: typing.Union[str, typing.List[str]],
                       output_file: typing.Union[str, typing.List[str]]):
-
+        """Runs filter on the output of underlying commands."""
         request = pickle.dumps({
             "request_type": "output",
             "args": {
-                "stage": lib_hook.stage_to_str(stage),
+                "stage": lib_hook.Stage_to_str(stage),
                 "input_file": input_file,
                 "output_file": output_file,
                 "stdout": output
@@ -31,7 +34,7 @@ class ClientOutputHandler:
         compile_obj = {
             "c_file": input_file,
             "obj_file": output_file,
-            "stage": lib_hook.stage_to_str(stage),
+            "stage": lib_hook.Stage_to_str(stage),
             "matches": []}
         lines = output.strip("\n").split("\n")
         to_report = False
@@ -53,6 +56,7 @@ class ClientOutputHandler:
             self.socket.send(size + request)
 
     def make_summary(self, input_files: typing.List[str], output_file: str):
+        """Make the summary of all reports"""
         request = pickle.dumps({
             "request_type": "summary",
             "args": {
@@ -63,8 +67,14 @@ class ClientOutputHandler:
         size = len(request).to_bytes(4, byteorder="big")
         self.socket.send(size+request)
 
+    def finalize(self):
+        """To make the abstract class happy."""
+        pass
+
 
 class ServerOutputHandler:
+    """The server side of the network output handler. It is NOT an abstract output handler since it is not use in
+    clang-hook."""
     def __init__(self, hook_config):
         self.config = hook_config
         self.output_obj = {"config": hook_config.data, "compils": []}
@@ -72,15 +82,18 @@ class ServerOutputHandler:
 
     def handle_output(self,
                       output: typing.Dict[str, str]):
+        """Handler for output request. Store the result."""
         self.output_obj["compils"].append(output)
 
     def handle_report(self,
                       report: typing.Dict[str, typing.Union[str, typing.List[typing.Dict[str, str]]]]):
+        """Handler for report request. Store the result."""
         self.report_obj["compils"].append(report)
 
     def handle_summary(self,
                        input_files: typing.List[str],
                        output_file: str):
+        """Handler for summary request. Use reports to compute the global summary."""
         summary_obj = {
             "executable": output_file,
             "obj_files": input_files,
@@ -104,6 +117,7 @@ class ServerOutputHandler:
         self.report_obj["summary"].append(summary_obj)
 
     def finalize(self):
+        """Finalize the output files."""
         with open(self.config.output_file, "w") as fd:
             json.dump(self.output_obj, fd, indent=4)
 

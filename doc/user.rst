@@ -106,8 +106,8 @@ Where are they ?
 By default, it will look at, in this order, from the most particular to the most
 general.
 
-1. ./clang-hook.conf
-2. $CLANG_HOOK_CONFIG
+1. $CLANG_HOOK_CONFIG
+2. ./clang-hook.conf
 3. $HOME/clang-hook.conf
 4. /etc/clang-hook/clang-hook.conf
 
@@ -115,7 +115,7 @@ With the option ``--hook-config file`` it will look at this location in first.
 However, if the file isn't found, the other paths are scanned.
 
 Most people who need this hook won't be happy with ONE config, thus, option 3
-and 4 are probably bad ideas. Option 1 seems good, but in cmake-based
+and 4 are probably bad ideas. Option 2 seems good, but in cmake-based
 compilation, the compiler is called from a large variety of location.
 
 During configuration, we can five the ``--hook-config`` option to
@@ -123,7 +123,7 @@ During configuration, we can five the ``--hook-config`` option to
 change the location of the configuration file (not the content), it would be
 necessary to reconfigure cmake.
 
-With the option 2, we can change the location when we want, there is nothing
+With the option 1, we can change the location when we want, there is nothing
 particular with the cmake configuration. It is the best way with cmake-based
 compilation to points to the configuration file to use. It just need to not 
 forget to set the variable.

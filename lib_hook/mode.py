@@ -1,3 +1,4 @@
+"""Mode definition and detection."""
 import os
 
 from .hook_parser import OutputType
@@ -5,13 +6,19 @@ from .auto_number import AutoNumber
 
 
 class Mode(AutoNumber):
+    """The mode of the compilation.
+    Compiling = .c -> .o
+    Linking = .o -> elf
+    CompilingAndLinking = .c -> elf"""
     Compiling = ()
     Linking = ()
     CompilingAndLinking = ()
 
 
 def get_mode(args, logger):
-    if len(args.input_files) == 0:
+    """Infer from the arguments the mode of the compilation. Also returns a list of pairs
+    (base file name with path, ext). This is handy to generate intermediate filename (bc, for instance"""
+    if not args.input_files:
         logger.panic("Need at least one input file", args)
 
     input_base_ext = [os.path.splitext(e) for e in args.input_files]

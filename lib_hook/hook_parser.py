@@ -1,3 +1,4 @@
+"""argparse based argument parser for clang-hook"""
 import abc
 import sys
 import argparse
@@ -6,6 +7,7 @@ from .auto_number import AutoNumber
 
 
 class OptimisationLevel(AutoNumber):
+    """Enumeration for -On option. Default is -O0."""
     O0 = ()
     O1 = ()
     O2 = ()
@@ -13,29 +15,32 @@ class OptimisationLevel(AutoNumber):
 
 
 class OutputType(AutoNumber):
+    """Enumeration for the output type of the given command."""
     Obj = ()
     Asm = ()
     Elf = ()
 
 
 def usage():
+    """Pretty usage message <3"""
     print(sys.argv[0]+"[clang options]")
 
 
 class OAction(argparse.Action):
-    def __init__(self, option_strings, dest, **kwargs):
-        super(OAction, self).__init__(option_strings, dest, **kwargs)
-
+    """Handles -On option."""
     def __call__(self, _parser, namespace, values, option_string=None):
-        opt = {"0": OptimisationLevel.O0,
-               "1": OptimisationLevel.O1,
-               "2": OptimisationLevel.O2,
-               "3": OptimisationLevel.O3,
-               }[values]
+        opt = {
+            "0": OptimisationLevel.O0,
+            "1": OptimisationLevel.O1,
+            "2": OptimisationLevel.O2,
+            "3": OptimisationLevel.O3,
+        }[values]
         setattr(namespace, self.dest, opt)
 
 
 class AbstractFlagAction(argparse.Action, metaclass=abc.ABCMeta):
+    """Handles options of the kind -Xfoo. It stores -Xfoo (and not just foo) to be easily given to the underlying
+    commands"""
     def __init__(self, prefix, option_strings, dest, **kwargs):
         self.prefix = prefix
         super(AbstractFlagAction, self).__init__(option_strings, dest, **kwargs)
@@ -52,26 +57,31 @@ class AbstractFlagAction(argparse.Action, metaclass=abc.ABCMeta):
 
 
 class WAction(AbstractFlagAction):
+    """Handles warning flags"""
     def __init__(self, option_strings, dest, **kwargs):
         super(WAction, self).__init__("-W", option_strings, dest, **kwargs)
 
 
 class LAction(AbstractFlagAction):
+    """Handles link flags"""
     def __init__(self, option_strings, dest, **kwargs):
         super(LAction, self).__init__("-l", option_strings, dest, **kwargs)
 
 
 class DAction(AbstractFlagAction):
+    """Handles define flags"""
     def __init__(self, option_strings, dest, **kwargs):
         super(DAction, self).__init__("-D", option_strings, dest, **kwargs)
 
 
 class IAction(AbstractFlagAction):
+    """Handles include flags"""
     def __init__(self, option_strings, dest, **kwargs):
         super(IAction, self).__init__("-I", option_strings, dest, **kwargs)
 
 
 def init_hook_parser():
+    """Builds and returns the argument parser."""
     p = argparse.ArgumentParser(description='Hook for clang.')
     p.add_argument("input_files", metavar="File", type=str, nargs='+', help="A file to compile")
     p.add_argument('-D', metavar="flag", dest='defines', action=DAction, type=str, help="A define")

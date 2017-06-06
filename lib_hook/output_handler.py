@@ -1,15 +1,20 @@
+"""Simple output handler"""
 import json
 import typing
-import lib_hook
 import collections
 
+from .stage import Stage, Stage_to_str
+from .filter import InvalidStage
+from .abstract_output_handler import AbstractOutputHandler
 
-class OutputHandler:
+
+class OutputHandler(AbstractOutputHandler):
+    """Output handler used in standalone mode."""
     def __init__(self, config, logger):
-        self.config = config
-        self.logger = logger
+        super(OutputHandler, self).__init__(config, logger)
 
         def load(path, fields):
+            """Helper to load a partial output/report file and initialize it if invalid or empty."""
             try:
                 fd = open(path)
             except FileNotFoundError:
@@ -32,20 +37,22 @@ class OutputHandler:
 
     def handle_output(self,
                       output: str,
-                      stage: lib_hook.Stage,
+                      stage: Stage,
                       input_file: typing.Union[str, typing.List[str]],
                       output_file: typing.Union[str, typing.List[str]]):
+        """Runs filter on the output of underlying commands."""
         if stage in self.config.output_stages:
             self.output_obj["compils"].append(
-                {"stage": lib_hook.stage_to_str(stage),
-                 "input_file": input_file,
-                 "output_file": output_file,
-                 "stdout": output
-                 })
+                {
+                    "stage": Stage_to_str(stage),
+                    "input_file": input_file,
+                    "output_file": output_file,
+                    "stdout": output
+                })
         compile_obj = {
             "c_file": input_file,
             "obj_file": output_file,
-            "stage": lib_hook.stage_to_str(stage),
+            "stage": Stage_to_str(stage),
             "matches": []}
         lines = output.strip("\n").split("\n")
         to_log = False
@@ -56,13 +63,14 @@ class OutputHandler:
                     if match is not None:
                         compile_obj["matches"].append({"name": f.name, "match": match})
                         to_log = True
-                except lib_hook.InvalidStage:
+                except InvalidStage:
                     pass
 
         if to_log:
             self.report_obj["compils"].append(compile_obj)
 
     def make_summary(self, input_files: typing.List[str], output_file: str):
+        """Make the summary of all reports"""
         summary_obj = {
             "executable": output_file,
             "obj_files": input_files,
@@ -97,6 +105,7 @@ class OutputHandler:
         self.report_obj["summary"].append(summary_obj)
 
     def finalize(self):
+        """Finalize the output files."""
         with open(self. config.output_file, "w") as fd:
             json.dump(self.output_obj, fd, indent=4)
 

@@ -1,30 +1,37 @@
+"""Everything for logging."""
 import abc
 import sys
 import pickle
 import logging
-import datetime
 import logging.handlers
+import datetime
 
 
 class AbstractLogger(metaclass=abc.ABCMeta):
+    """Abstract class that constraints loggers methods."""
     @abc.abstractmethod
     def panic(self, msg, args=None):
+        """Log an error and quit abnormally."""
         pass
 
     @abc.abstractmethod
     def warning(self, msg, args=None):
+        """Log a warning and continue."""
         pass
 
     @abc.abstractmethod
     def debug(self, msg):
+        """Log debugging information."""
         pass
 
     @abc.abstractmethod
     def info(self, msg):
+        """Log info information."""
         pass
 
 
 class Logger:
+    """Simple logger. Use 3 files: error, info, debug."""
     def __init__(self):
         self.pre_log_info = []
         self.pre_log_warning = []
@@ -35,6 +42,7 @@ class Logger:
         self.enable = None
 
     def panic(self, msg, args=None):
+        """Log an error and quit abnormally."""
         print(msg)
         print("Aborting")
         if self.logger_error is not None:
@@ -45,6 +53,7 @@ class Logger:
         sys.exit(2)
 
     def warning(self, msg, args=None):
+        """Log a warning and continue."""
         if self.logger_error is not None:
             self.logger_error.warning(msg)
             self.logger_error.warning("    input: "+str(sys.argv))
@@ -53,18 +62,22 @@ class Logger:
             self.pre_log_warning.extend([msg, "    input: "+str(sys.argv), "   args: "+str(args)])
 
     def debug(self, msg):
+        """Log debugging information."""
         if self.logger_debug is not None:
             self.logger_debug.debug(msg)
         elif self.enable is None:
             self.pre_log_debug.append(msg)
 
     def info(self, msg):
+        """Log info information."""
         if self.logger_info is not None:
             self.logger_info.info(msg)
         elif self.enable is None:
             self.pre_log_info.append(msg)
 
     def init(self, args, config):
+        """Initialize the logger. Used time-based rotating file handler. The hope is to easily separate log of different
+        runs of the test suite."""
         if config.log:
             self.enable = True
             if config.error_log is None:
@@ -113,7 +126,9 @@ class Logger:
 
 
 class ServerLogger(Logger):
+    """A basic logger with a dispatch function to handle network request."""
     def dispatch(self, request):
+        """Redirect the request to the right function."""
         if request["args"]["level"] == "info":
             self.info(request["args"]["msg"])
         elif request["args"]["level"] == "warn":
@@ -125,10 +140,12 @@ class ServerLogger(Logger):
 
 
 class ClientLogger:
+    """A logger that send everything via the given socket into standard dictionnay requests."""
     def __init__(self, socket):
         self.socket = socket
 
     def panic(self, msg: str, args=None):
+        """Log an error and quit abnormally."""
         request = pickle.dumps({
             "request_type": "log",
             "args": {
@@ -142,6 +159,7 @@ class ClientLogger:
         sys.exit(2)
 
     def warning(self, msg, args=None):
+        """Log a warning and continue."""
         request = pickle.dumps({
             "request_type": "log",
             "args": {
@@ -154,6 +172,7 @@ class ClientLogger:
         self.socket.send(size+request)
 
     def debug(self, msg):
+        """Log debugging information."""
         request = pickle.dumps({
             "request_type": "log",
             "args": {
@@ -165,6 +184,7 @@ class ClientLogger:
         self.socket.send(size+request)
 
     def info(self, msg):
+        """Log info information."""
         request = pickle.dumps({
             "request_type": "log",
             "args": {
@@ -177,6 +197,7 @@ class ClientLogger:
 
 
 class DummyLogger(AbstractLogger):
+    """A stupid logger that keeps everything in lists. Used for testing purposes."""
     def __init__(self):
         self.panic_list = []
         self.warning_list = []
@@ -184,17 +205,22 @@ class DummyLogger(AbstractLogger):
         self.info_list = []
 
     def panic(self, msg, args=None):
+        """Log an error and does NOT quit abnormally."""
         self.panic_list.append(msg)
 
     def warning(self, msg, args=None):
+        """Log a warning and continue."""
         self.warning_list.append(msg)
 
     def debug(self, msg):
+        """Log debugging information."""
         self.debug_list.append(msg)
 
     def info(self, msg):
+        """Log info information."""
         self.info_list.append(msg)
 
 
-def print_debug_info(n, s):
-    print("\033[34m%s\033[0m: %s" % (n, s))
+def print_debug_info(name, value):
+    """A nice print with color for debugging purpose."""
+    print("\033[34m%s\033[0m: %s" % (name, value))

@@ -1,7 +1,9 @@
+"""argparse based argument parser for over-make"""
 import argparse
 
 
 def init_over_parser():
+    """Builds and returns the argument parser."""
     p = argparse.ArgumentParser(description='over-make.')
     p.add_argument("command", metavar="command", type=str, nargs='+', help="The command to run")
     p.add_argument("-j", metavar="n", type=int, dest="j", action="store", help="Just -j of make")

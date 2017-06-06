@@ -1,5 +1,6 @@
+"""This module contains as much code as possible which is shared between clang-hook and over-make."""
 from .mode import Mode, get_mode
-from .stage import str_to_stage, stage_to_str, Stage
+from .stage import Str_to_stage, Stage_to_str, Stage
 from .filter import Filter, InvalidStage
 from .logging import Logger, ServerLogger, ClientLogger, print_debug_info
 from .compiler import Compiler
